@@ -12,12 +12,14 @@ Basic usage is:
 
 where $options is a hash reference.  Valid keys are:
 
-`output`
-:  the output format (case insensitive string) - one of `html` (default), `text`,
+* `output`: the output format (case insensitive string) - one of `html` (default), `text`,
    `latex`, `beamer`, `memoir`
+* `smart`: boolean indicating whether smart quote processing should be enabled
 
-`smart`
-:  boolean indicating whether smart quote processing should be enabled
+More options will be added in future versions of the module.
+
+The module includes the beginnings of a _man_ output option.  This compiles but is
+non-functional.  When it is complete it will be submitted to the MultiMarkdown-4 repo.
 
 
 Build instructions
