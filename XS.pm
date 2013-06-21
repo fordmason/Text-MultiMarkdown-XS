@@ -7,7 +7,7 @@ use vars qw(@constants);
 require Exporter;
 require DynaLoader;
 
-our $VERSION = "0.001_02";
+our $VERSION = "0.001_03";
 our @ISA     = qw(Exporter DynaLoader);
 
 BEGIN {
@@ -49,8 +49,37 @@ my %option_defs = ( smart        => [ bool    => EXT_SMART ],
 		    use_metadata => [ invbool => EXT_NO_METADATA ],
     );
 
+
+sub new {
+    my $class = shift;
+    my $options;
+    if (@_ == 1 and ref $_[0] eq 'HASH') {
+	$options = shift;
+    }
+    else {
+	$options = { @_ };
+    }
+    return bless $options, ref($class) || $class;
+}
+
+
 sub markdown {
+    my $self = shift;
+
+    # Detect functional mode, and create an instance for this run..
+    unless (ref $self) {
+        if ( $self ne __PACKAGE__ ) {
+            my $ob = __PACKAGE__->new();
+                                # $self is text, $text is options
+            return $ob->markdown($self, @_);
+        }
+        else {
+            croak('Calling ' . $self . '->markdown (as a class method) is not supported.');
+        }
+    }
+
     my ($text, $options) = @_;
+
     my $extensions    = EXT_SMART;
     my $output_format = HTML_FORMAT;
 
@@ -88,6 +117,8 @@ sub markdown {
     return _markdown($text, $extensions, $output_format);
 }
 
+
+sub DESTROY {}
 
 sub AUTOLOAD {
     # This AUTOLOAD is used to 'autoload' constants from the constant()
