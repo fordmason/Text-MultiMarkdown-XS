@@ -14,7 +14,16 @@ where $options is a hash reference.  Valid keys are:
 
 * `output`: the output format (case insensitive string) - one of `html` (default), `text`,
    `latex`, `beamer`, `memoir`
-* `smart`: boolean indicating whether smart quote processing should be enabled
+* `complete`: boolean indicating whether to output a complete document or just a fragment
+  (default is to output a fragment)
+* `obfuscate`: boolean indicating whether `mailto:` links should be obfuscated (default is false)
+* `smart`: boolean indicating whether smart quote processing should be enabled (default is false)
+* `use_metadata`: boolean to control whether metadata at the start of the input text is
+  processed (default is true)
+
+A false value for a boolean option can be specified as `undef`, `0`, `"false"`, or
+`"off"`.  Any other value is taken to be true.  The string values `"false"` and `"off"`
+are case-insensitive.
 
 More options will be added in future versions of the module.
 

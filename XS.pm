@@ -7,7 +7,7 @@ use vars qw(@constants);
 require Exporter;
 require DynaLoader;
 
-our $VERSION = "0.001_01";
+our $VERSION = "0.001_02";
 our @ISA     = qw(Exporter DynaLoader);
 
 BEGIN {
@@ -17,6 +17,8 @@ BEGIN {
                           EXT_FILTER_STYLES
                           EXT_NOTES     
                           EXT_NO_LABELS
+                          EXT_NO_METADATA
+                          EXT_OBFUSCATE
                           EXT_PROCESS_HTML
                           EXT_SMART
 
@@ -39,6 +41,13 @@ our @EXPORT  = ( 'markdown', '$mmd_version', @constants );
 __PACKAGE__->bootstrap($VERSION);
 
 my $format_re = qr{ ^ (?: HTML | TEXT | LATEX | MEMOIR | BEAMER | MAN | ODF | OPML | RTF ) }x;
+my $false_re  = qr{^(?:|0|false|off)$}i;
+
+my %option_defs = ( smart        => [ bool    => EXT_SMART ],
+		    complete     => [ bool    => EXT_COMPLETE ],
+		    obfuscate    => [ bool    => EXT_OBFUSCATE ],
+		    use_metadata => [ invbool => EXT_NO_METADATA ],
+    );
 
 sub markdown {
     my ($text, $options) = @_;
@@ -52,13 +61,28 @@ sub markdown {
             $output_format = constant("${value}_FORMAT");
         }
     }
-    if (exists $options->{smart}) {
-        if ($options->{smart}) {
-            $extensions |= EXT_SMART;
-        }
-        else {
-            $extensions ^= EXT_SMART;
-        }
+
+    foreach my $option (keys %option_defs) {
+	if (exists $options->{$option}) {
+	    my $value = $options->{$option} || '';
+	    my ($type, $flag) = @{$option_defs{$option}};
+	    if ($type eq 'bool') {
+		if ($value =~ $false_re) {
+		    $extensions &= ~$flag;
+		}
+		else {
+		    $extensions |= $flag;
+		}
+	    }
+	    elsif ($type eq 'invbool') {
+		if ($value =~ $false_re) {
+		    $extensions |= $flag;
+		}
+		else {
+		    $extensions &= ~$flag;
+		}
+	    }
+	}
     }
 
     return _markdown($text, $extensions, $output_format);
@@ -103,7 +127,7 @@ Text::MultiMarkdown::XS
 B<Warning>: this is the first, alpha release of the module and the interface is liable to
 change without notice.
 
-C<Text::MultiMarkdown::XS> is a wrapper around Fletcher T. Penney's multimarkdown library
+C<Text::MultiMarkdown::XS> is a wrapper around Fletcher T. Penney's MultiMarkdown library
 (version 4).
 
 =head1 OPTIONS
@@ -124,6 +148,10 @@ the output format - a case-insensitive string, which may take one of the followi
 
 =back
 
+=item C<complate>
+
+boolean value to specify whether a complete document or a fragment should be generated
+
 
 =item C<smart>
 
@@ -131,7 +159,8 @@ boolean value to specify whether I<smart> quotes should be enabled.
 
 =back
 
-
+The following values are accepted as boolean false values: C<undef>, 0, 'false' or 'off'
+(string values are case-insensitive). Anything else is regarded as true.
 
 
 =head1 AUTHOR
