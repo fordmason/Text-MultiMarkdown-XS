@@ -1,0 +1,10 @@
+#*
+*.inc
+*.o
+*.tar*
+*~
+blib
+pm_to_blib
+Makefile
+XS.bs
+XS.c
