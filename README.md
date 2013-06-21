@@ -20,4 +20,25 @@ where $options is a hash reference.  Valid keys are:
 :  boolean indicating whether smart quote processing should be enabled
 
 
+Build instructions
+------------------
 
+Standard Perl build sequence:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Building requires a C compiler.
+
+
+To Do
+-----
+
+* more complete set of options that map to the library's options
+* include Fletcher's C code as a git sub repository (need to get the build working with that)
+* expand test suite
+* integrate into Text::MultiMarkdown, so that that module loads this XS module if it is
+  installed or defaults to the pure perl version.  May need to carp if the options
+  supplied are not compatible with the PP version.
